@@ -23,6 +23,38 @@ Apify.main(async () => {
     console.log('Waiting for the page');
     await page.goto(url, { waitUntil, timeout: 3600000 });
 
+    var h1_visible = await page.evaluate(() => {
+        const $ = window.$; //otherwise the transpiler will rename it and won't work
+        return $('h1').is(":visible");
+    });
+
+    var has_title = await page.evaluate(() => {
+        const $ = window.$;
+        if ($('title').length){
+            return true
+        } else {
+            return false;
+        }
+    });
+
+    var has_meta = await page.evaluate(() => {
+        const $ = window.$;
+        if ($('meta').length){
+            return true
+        } else {
+            return false;
+        }
+    });
+
+    console.log("h1_visible", h1_visible);
+    console.log("has_title", has_title)
+    console.log("has_meta", has_meta)
+    await Apify.setValue("META", {
+        h1_visible: h1_visible,
+        has_title: has_title,
+        has_meta: has_meta
+    });
+
     // Scroll to bottom before delay so that delay is enough time for images to load
     if (scrollToBottom) {
         console.log('Scrolling to the bottom');
